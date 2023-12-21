@@ -40,7 +40,7 @@ If we assume the distribution underlying the inputs are normal ($X_{0}$ for regr
 <meta itemprop="description" content="When computing a regression coefficient we hopefully can reject the null hypothesis that there is no relationship between the dependent and independent variable ($ \beta_0 = 0 $). When evaluating a trading strategies returns we aim to reject the null hypothesis that they are unprofitable random noise around 0.
 If we assume the distribution underlying the inputs are normal ($X_{0}$ for regression and $r_{t}$ for returns) we can use the t-stat to decide to reject these hypothesis&rsquo; or not."><meta itemprop="datePublished" content="2023-12-13T19:56:41+00:00" />
 <meta itemprop="dateModified" content="2023-12-13T19:56:41+00:00" />
-<meta itemprop="wordCount" content="583"><meta itemprop="image" content="https://flugplatz.github.io/blog/"/>
+<meta itemprop="wordCount" content="691"><meta itemprop="image" content="https://flugplatz.github.io/blog/"/>
 <meta itemprop="keywords" content="t-stat,sampling," />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://flugplatz.github.io/blog/"/>
@@ -150,7 +150,7 @@ If we assume the distribution underlying the inputs are normal ($X_{0}$ for regr
           <circle cx="12" cy="12" r="10"></circle>
           <polyline points="12 6 12 12 16 14"></polyline>
         </svg>
-        3 minutes
+        4 minutes
 
         
       </p>
@@ -172,8 +172,9 @@ If we assume the distribution underlying the inputs are normal ($X_{0}$ for regr
 <p>If we assume the distribution underlying the inputs are normal ($X_{0}$ for regression and $r_{t}$ for returns) we can use the <em>t-stat</em> to decide to reject these hypothesis&rsquo; or not. The t-stat measures the number of standard errors (SE) the mean value is from a reference point ($ \beta_0 $). As discussed in our examples above our reference point is 0, so we can drop this term going forward. The SE is a estimator which uses the sample standard deviation ($\hat{\sigma}$) to estimate the population standard deviation ($\sigma$). Note that as the number of samples (N) increases the SE gets smaller, reflecting our increased confidence in our approximation of $\hat{\sigma}$ due to more datapoints - we&rsquo;ll revisit this point later.</p>
 <p>$$ t_{\hat{\beta}} = \frac{\hat{\beta} - \beta_0}{SE(\hat{\beta})} \ \ \ \ \ \ \ SE = \frac{\hat{\sigma}}{\sqrt{N}} $$</p>
 <p>A well known fact of the normal distribution is that around 95% of the values are within $2\sigma$ of the mean. If our t-stat is greater than 2 (read: the mean value is more than $2\sigma$ from 0 - our null hypothesis) then there is a 5% probability this is by random chance. This probability threshold (<em>p-value</em>) of 5% is a common cutoff to reject the null hypothesis in literature. <em>Note:</em> this cutoff is for a single test, if we make multiple attempts the p-value should be reduced accordingly.</p>
-<p>Reading <em>Long Horizon Predictability: A Cautionary Tale</em> <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>, It warns that when sample overlap is present (common in time series modelling) the standard error can be underestimated. Due to serial correlation in the data we have many datapoints which hold less value individually. To prove trivially we can duplicate all of our data points and watch the SE drop even though we are adding no new data.</p>
-<p>It proposes an adjustment to the non-overlapping variance ($\sigma^2$), the formula is split out below. <em>J</em> is the number of lookahead ticks, <em>ol</em> signifies a series with overlaps, <em>nol</em> is one with no overlaps.</p>
+<p>Reading <em>Long Horizon Predictability: A Cautionary Tale</em> <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>, It warns that when sample overlap is present (common in time series modelling) the standard error can be underestimated. Due to serial correlation in the data we have datapoints which hold less value than expected in an Independent and Identically distributed (IID) world.</p>
+<p>For example if we forecast 10 ticks into the future, a target datapoint at t and t+1 will share 9/10 ticks of lookahead, this shared dependency path is likely to lead to correlated or identical target values. Similarly lookback feature measurements based on rolling windows are not likely to change much tick to tick. To trivially highlight this issue, we can duplicate all of our sample data points and watch the SE drop even though we are adding no new information.</p>
+<p>To correct for this the paper proposes measuring and adjusting the non overlapping variance ($\sigma^2$) before we incorporate it into the SE and t-stat, the formula is split out below. <em>J</em> is the number of lookahead ticks, <em>ol</em> signifies a series with overlaps, <em>nol</em> is one with no overlaps.</p>
 <p>$$
 var(\hat{\beta}_J^{ol}) = var(\hat{\beta}_J^{nol})[\frac{1}{J} + \theta(J, \rho_J)]
 $$</p>
@@ -185,6 +186,7 @@ $$</p>
 <li>$\frac{1}{J}$ adjusts the multiplier (variance) of <em>nol</em> downwards as <em>ol</em> has J times more observations.</li>
 <li>$\theta$ adjusts the multiplier (variance) upwards as a function of the autocorrelation.  If autocorrelation is high then we are not adding additional information over the <em>nol</em> version (similar to our trivial example where we duplicate all values).</li>
 </ul>
+<p>A Python implementation is shown below:</p>
 <div class="highlight"><pre tabindex="0" style="color:#c6d0f5;background-color:#303446;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Python" data-lang="Python"><span style="display:flex;"><span><span style="color:#81c8be">from</span> <span style="color:#ef9f76">statsmodels.graphics.tsaplots</span> <span style="color:#81c8be">import</span> acf
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#ca9ee6">def</span> <span style="color:#8caaee">adj_t_stat</span>(signal, lookahead):
@@ -203,7 +205,7 @@ $$</p>
 </span></span><span style="display:flex;"><span>    t <span style="color:#99d1db;font-weight:bold">=</span> signal<span style="color:#99d1db;font-weight:bold">.</span>mean() <span style="color:#99d1db;font-weight:bold">/</span> se
 </span></span><span style="display:flex;"><span>    
 </span></span><span style="display:flex;"><span>    <span style="color:#ca9ee6">return</span> t</span></span></code></pre></div>
-<p>We can see the effect of the adjustment in the scatterplot below. This is taken from some walk forward testing of a trading strategy.</p>
+<p>To evaluate the effects of the adjustment we calculate the naive t-stat and the adjusted version on some timeseries forecast signal returns taken a walk forward evaluation. The results are shown in the scatterplot below, we can see that the t-stat is adjusted downward as expected.</p>
 <p><img src="/blog/images/adj_t_stat.png" alt="Adjustment"></p>
 <div class="footnotes" role="doc-endnotes">
 <hr>
@@ -239,7 +241,7 @@ $$</p>
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        583 Words
+        691 Words
       </p>
 
       <p>

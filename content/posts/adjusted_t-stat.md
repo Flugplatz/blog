@@ -18,9 +18,11 @@ $$ t_{\hat{\beta}} = \frac{\hat{\beta} - \beta_0}{SE(\hat{\beta})} \ \ \ \ \ \ \
 
 A well known fact of the normal distribution is that around 95% of the values are within $2\sigma$ of the mean. If our t-stat is greater than 2 (read: the mean value is more than $2\sigma$ from 0 - our null hypothesis) then there is a 5% probability this is by random chance. This probability threshold (*p-value*) of 5% is a common cutoff to reject the null hypothesis in literature. *Note:* this cutoff is for a single test, if we make multiple attempts the p-value should be reduced accordingly.
 
-Reading *Long Horizon Predictability: A Cautionary Tale* [^1], It warns that when sample overlap is present (common in time series modelling) the standard error can be underestimated. Due to serial correlation in the data we have many datapoints which hold less value individually. To prove trivially we can duplicate all of our data points and watch the SE drop even though we are adding no new data.
+Reading *Long Horizon Predictability: A Cautionary Tale* [^1], It warns that when sample overlap is present (common in time series modelling) the standard error can be underestimated. Due to serial correlation in the data we have datapoints which hold less value than expected in an Independent and Identically distributed (IID) world. 
 
-It proposes an adjustment to the non-overlapping variance ($\sigma^2$), the formula is split out below. *J* is the number of lookahead ticks, *ol* signifies a series with overlaps, *nol* is one with no overlaps.
+For example if we forecast 10 ticks into the future, a target datapoint at t and t+1 will share 9/10 ticks of lookahead, this shared dependency path is likely to lead to correlated or identical target values. Similarly lookback feature measurements based on rolling windows are not likely to change much tick to tick. To trivially highlight this issue, we can duplicate all of our sample data points and watch the SE drop even though we are adding no new information.
+
+To correct for this the paper proposes measuring and adjusting the non overlapping variance ($\sigma^2$) before we incorporate it into the SE and t-stat, the formula is split out below. *J* is the number of lookahead ticks, *ol* signifies a series with overlaps, *nol* is one with no overlaps.
 
 $$ 
 var(\hat{\beta}_J^{ol}) = var(\hat{\beta}_J^{nol})[\frac{1}{J} + \theta(J, \rho_J)] 
@@ -35,6 +37,8 @@ The first part applies a multiplier to the variance of the non-overlapping varia
 The multiplier has offsetting adjustments:
 * $\frac{1}{J}$ adjusts the multiplier (variance) of *nol* downwards as *ol* has J times more observations.
 * $\theta$ adjusts the multiplier (variance) upwards as a function of the autocorrelation.  If autocorrelation is high then we are not adding additional information over the *nol* version (similar to our trivial example where we duplicate all values).
+
+A Python implementation is shown below:
 
 {{< highlight Python >}}
 from statsmodels.graphics.tsaplots import acf
@@ -57,7 +61,7 @@ def adj_t_stat(signal, lookahead):
     return t
 {{< /highlight >}}
 
-We can see the effect of the adjustment in the scatterplot below. This is taken from some walk forward testing of a trading strategy.
+To evaluate the effects of the adjustment we calculate the naive t-stat and the adjusted version on some timeseries forecast signal returns taken a walk forward evaluation. The results are shown in the scatterplot below, we can see that the t-stat is adjusted downward as expected.
 
 ![Adjustment](/blog/images/adj_t_stat.png)
 
