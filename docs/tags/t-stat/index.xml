@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>t-stat on Flugplatz</title>
+    <link>https://flugplatz.github.io/blog/tags/t-stat/</link>
+    <description>Recent content in t-stat on Flugplatz</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+    <lastBuildDate>Wed, 13 Dec 2023 19:56:41 +0000</lastBuildDate>
+    <atom:link href="https://flugplatz.github.io/blog/tags/t-stat/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Adjusted t-stat for overlapping samples</title>
+      <link>https://flugplatz.github.io/blog/posts/adjusted_t-stat/</link>
+      <pubDate>Wed, 13 Dec 2023 19:56:41 +0000</pubDate>
+      <guid>https://flugplatz.github.io/blog/posts/adjusted_t-stat/</guid>
+      <description>When computing a regression coefficient we hopefully can reject the null hypothesis that there is no relationship between the dependent and independent variable ($ \beta_0 = 0 $). When evaluating a trading strategies returns we aim to reject the null hypothesis that they are unprofitable random noise around 0.
+If we assume the distribution underlying the inputs are normal ($X_{0}$ for regression and $r_{t}$ for returns) we can use the t-stat to decide to reject these hypothesis&amp;rsquo; or not.</description>
+    </item>
+  </channel>
+</rss>

@@ -10,10 +10,38 @@
     <lastBuildDate>Wed, 20 Dec 2023 13:29:35 +0000</lastBuildDate>
     <atom:link href="https://flugplatz.github.io/blog/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>untagged</title>
-      <link>https://flugplatz.github.io/blog/tags/untagged/</link>
+      <title>btree</title>
+      <link>https://flugplatz.github.io/blog/tags/btree/</link>
       <pubDate>Wed, 20 Dec 2023 13:29:35 +0000</pubDate>
-      <guid>https://flugplatz.github.io/blog/tags/untagged/</guid>
+      <guid>https://flugplatz.github.io/blog/tags/btree/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>orderbook</title>
+      <link>https://flugplatz.github.io/blog/tags/orderbook/</link>
+      <pubDate>Wed, 20 Dec 2023 13:29:35 +0000</pubDate>
+      <guid>https://flugplatz.github.io/blog/tags/orderbook/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>rust</title>
+      <link>https://flugplatz.github.io/blog/tags/rust/</link>
+      <pubDate>Wed, 20 Dec 2023 13:29:35 +0000</pubDate>
+      <guid>https://flugplatz.github.io/blog/tags/rust/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>sampling</title>
+      <link>https://flugplatz.github.io/blog/tags/sampling/</link>
+      <pubDate>Wed, 13 Dec 2023 19:56:41 +0000</pubDate>
+      <guid>https://flugplatz.github.io/blog/tags/sampling/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>t-stat</title>
+      <link>https://flugplatz.github.io/blog/tags/t-stat/</link>
+      <pubDate>Wed, 13 Dec 2023 19:56:41 +0000</pubDate>
+      <guid>https://flugplatz.github.io/blog/tags/t-stat/</guid>
       <description></description>
     </item>
   </channel>

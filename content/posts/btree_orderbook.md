@@ -5,7 +5,9 @@ draft: false
 toc: false
 images:
 tags:
-  - untagged
+  - rust
+  - orderbook
+  - btree
 ---
 
 The orderbook is an interesting object to model, likely to be dense with orders near the top of the book and sparser as we walk outwards towards the "stink bids". While reading *Database Internals: A Deep-Dive into How Distributed Data Systems Work* [^1], its low level discussion of BTree internals peaked my curiosity into the efficiency of using a BTree to model an orderbook. My main observations are:

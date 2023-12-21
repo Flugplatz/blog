@@ -6,7 +6,8 @@ toc: false
 images:
 math: true
 tags:
-  - untagged
+  - t-stat
+  - sampling
 ---
 
 When computing a regression coefficient we hopefully can reject the null hypothesis that there is no relationship between the dependent and independent variable ($ \beta_0 = 0 $). When evaluating a trading strategies returns we aim to reject the null hypothesis that they are unprofitable random noise around 0. 

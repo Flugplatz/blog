@@ -2,22 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://flugplatz.github.io/blog/tags/btree/</loc>
+    <lastmod>2023-12-20T13:29:35+00:00</lastmod>
+  </url><url>
     <loc>https://flugplatz.github.io/blog/</loc>
     <lastmod>2023-12-20T13:29:35+00:00</lastmod>
   </url><url>
     <loc>https://flugplatz.github.io/blog/posts/btree_orderbook/</loc>
     <lastmod>2023-12-20T13:29:35+00:00</lastmod>
   </url><url>
+    <loc>https://flugplatz.github.io/blog/tags/orderbook/</loc>
+    <lastmod>2023-12-20T13:29:35+00:00</lastmod>
+  </url><url>
     <loc>https://flugplatz.github.io/blog/posts/</loc>
+    <lastmod>2023-12-20T13:29:35+00:00</lastmod>
+  </url><url>
+    <loc>https://flugplatz.github.io/blog/tags/rust/</loc>
     <lastmod>2023-12-20T13:29:35+00:00</lastmod>
   </url><url>
     <loc>https://flugplatz.github.io/blog/tags/</loc>
     <lastmod>2023-12-20T13:29:35+00:00</lastmod>
   </url><url>
-    <loc>https://flugplatz.github.io/blog/tags/untagged/</loc>
-    <lastmod>2023-12-20T13:29:35+00:00</lastmod>
-  </url><url>
     <loc>https://flugplatz.github.io/blog/posts/adjusted_t-stat/</loc>
+    <lastmod>2023-12-13T19:56:41+00:00</lastmod>
+  </url><url>
+    <loc>https://flugplatz.github.io/blog/tags/sampling/</loc>
+    <lastmod>2023-12-13T19:56:41+00:00</lastmod>
+  </url><url>
+    <loc>https://flugplatz.github.io/blog/tags/t-stat/</loc>
     <lastmod>2023-12-13T19:56:41+00:00</lastmod>
   </url><url>
     <loc>https://flugplatz.github.io/blog/blog/</loc>

@@ -7,7 +7,7 @@
 <meta name="author" content="">
 <meta name="description" content="The orderbook is an interesting object to model, likely to be dense with orders near the top of the book and sparser as we walk outwards towards the &amp;ldquo;stink bids&amp;rdquo;. While reading Database Internals: A Deep-Dive into How Distributed Data Systems Work 1, its low level discussion of BTree internals peaked my curiosity into the efficiency of using a BTree to model an orderbook. My main observations are:
 It was presented as a disadvantage that file based databases have to marshall their data structures explicitly on disk while in-memory databases just malloc() memory chunks from an allocator." />
-<meta name="keywords" content=", untagged" />
+<meta name="keywords" content=", rust, orderbook, btree" />
 <meta name="robots" content="noodp" />
 <meta name="theme-color" content="" />
 <link rel="canonical" href="https://flugplatz.github.io/blog/posts/btree_orderbook/" />
@@ -41,7 +41,7 @@ It was presented as a disadvantage that file based databases have to marshall th
 It was presented as a disadvantage that file based databases have to marshall their data structures explicitly on disk while in-memory databases just malloc() memory chunks from an allocator."><meta itemprop="datePublished" content="2023-12-20T13:29:35+00:00" />
 <meta itemprop="dateModified" content="2023-12-20T13:29:35+00:00" />
 <meta itemprop="wordCount" content="798"><meta itemprop="image" content="https://flugplatz.github.io/blog/"/>
-<meta itemprop="keywords" content="untagged," />
+<meta itemprop="keywords" content="rust,orderbook,btree," />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://flugplatz.github.io/blog/"/>
 
@@ -249,7 +249,9 @@ It was presented as a disadvantage that file based databases have to marshall th
     <p>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>
 
-        <span class="tag"><a href="https://flugplatz.github.io/blog/tags/untagged/">untagged</a></span>
+        <span class="tag"><a href="https://flugplatz.github.io/blog/tags/rust/">rust</a></span>
+        <span class="tag"><a href="https://flugplatz.github.io/blog/tags/orderbook/">orderbook</a></span>
+        <span class="tag"><a href="https://flugplatz.github.io/blog/tags/btree/">btree</a></span>
         
     </p>
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>rust on Flugplatz</title>
+    <link>https://flugplatz.github.io/blog/tags/rust/</link>
+    <description>Recent content in rust on Flugplatz</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+    <lastBuildDate>Wed, 20 Dec 2023 13:29:35 +0000</lastBuildDate>
+    <atom:link href="https://flugplatz.github.io/blog/tags/rust/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Is the BTree an efficient structure to model an orderbook?</title>
+      <link>https://flugplatz.github.io/blog/posts/btree_orderbook/</link>
+      <pubDate>Wed, 20 Dec 2023 13:29:35 +0000</pubDate>
+      <guid>https://flugplatz.github.io/blog/posts/btree_orderbook/</guid>
+      <description>The orderbook is an interesting object to model, likely to be dense with orders near the top of the book and sparser as we walk outwards towards the &amp;ldquo;stink bids&amp;rdquo;. While reading Database Internals: A Deep-Dive into How Distributed Data Systems Work 1, its low level discussion of BTree internals peaked my curiosity into the efficiency of using a BTree to model an orderbook. My main observations are:
+It was presented as a disadvantage that file based databases have to marshall their data structures explicitly on disk while in-memory databases just malloc() memory chunks from an allocator.</description>
+    </item>
+  </channel>
+</rss>
