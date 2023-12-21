@@ -1,0 +1,174 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Posts on Flugplatz</title>
+        <link>flugplatz.github.io/posts/</link>
+        <description>Recent content in Posts on Flugplatz</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en</language>
+        <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+        <lastBuildDate>Wed, 20 Dec 2023 13:29:35 +0000</lastBuildDate>
+        <atom:link href="flugplatz.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>Is the BTree an efficient structure to model an orderbook?</title>
+            <link>flugplatz.github.io/posts/btree_orderbook/</link>
+            <pubDate>Wed, 20 Dec 2023 13:29:35 +0000</pubDate>
+            
+            <guid>flugplatz.github.io/posts/btree_orderbook/</guid>
+            <description>The orderbook is an interesting object to model, likely to be dense with orders near the top of the book and sparser as we walk outwards towards the &amp;ldquo;stink bids&amp;rdquo;. While reading Database Internals: A Deep-Dive into How Distributed Data Systems Work 1, its low level discussion of BTree internals peaked my curiosity into the efficiency of using a BTree to model an orderbook. My main observations are:
+It was presented as a disadvantage that file based databases have to marshall their data structures explicitly on disk while in-memory databases just malloc() memory chunks from an allocator.</description>
+            <content type="html"><![CDATA[<p>The orderbook is an interesting object to model, likely to be dense with orders near the top of the book and sparser as we walk outwards towards the &ldquo;stink bids&rdquo;. While reading <em>Database Internals: A Deep-Dive into How Distributed Data Systems Work</em> <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>, its low level discussion of BTree internals peaked my curiosity into the efficiency of using a BTree to model an orderbook. My main observations are:</p>
+<ol>
+<li>
+<p>It was presented as a disadvantage that file based databases have to marshall their data structures explicitly on disk while in-memory databases just <code>malloc()</code> memory chunks from an allocator. However, if the memory returned from the allocator is fragmented then the cache efficiency of traversing the BTree structure is going to be impacted negatively.</p>
+</li>
+<li>
+<p>The search path from the root node to the leafs involves a lot of searching sorted lists which equates to a lot of work for the CPUs branch predictor. Incorrectly guessed branches equates to wasted computation.</p>
+</li>
+<li>
+<p>Mutations / admin tasks where nodes are expanded and collapsed dynamically suggests unpredictable latency spikes. These will be &ldquo;amortized&rdquo; in the CPU complexity of the structure.</p>
+</li>
+</ol>
+<p>One parameter to optimise regarding the points above is <code>B</code>, controlling the number of entries in each node. If we increase this we can leverage bigger nodes for cache efficiency and incur some additional costs when searching / mutating. Unfortunately the Rust std implementation does not let you specify this parameter, it is hardcoded at 16.</p>
+<h2 id="an-alternative">An alternative</h2>
+<p>Since we have a predictable range of keys (price ticks), can we throw memory at the problem and pre-allocate a cache friendly contiguous array of the size of every possible price?</p>
+<p>The <a href="https://docs.rs/stable-vec/latest/stable_vec/">StableVec</a> library allows us to allocate a contiguous array with &ldquo;stable&rdquo; keys, ie. they will never change. This means when an entry is removed it is simply flagged as deleted and no expensive shifting of greater entries backwards as you get with a standard Vec is incurred. This is conceptually the same as allocating a large Vec of Options and setting values to <code>None</code> instead of removing: <code>Vec&lt;Option&lt;T&gt;&gt;::with_capacity(N)</code>.</p>
+<h2 id="profiling">Profiling</h2>
+<p>To benchmark we process a days worth of Binance L2 price updates for BTCUSDT into each orderbook implementation (141327104 bid and ask updates) and look at the ouput of the <code>perf</code> command.</p>
+<p>We profile the <em>BTreeMap</em> orderbook implementation (12.9s elapsed):</p>
+<pre tabindex="0"><code> Performance counter stats for &#39;target/release/btree-ob-eval b&#39;:
+
+     3,681,556,457      cache-references
+       202,381,615      cache-misses              #    5.497 % of all cache refs
+   224,968,394,162      cycles
+   595,727,002,465      instructions              #    2.65  insn per cycle
+   140,040,270,447      branches
+         2,761,188      faults
+                38      migrations
+</code></pre><p>And the <em>StableVec</em> orderbook implementation (5.9s elapsed):</p>
+<pre tabindex="0"><code> Performance counter stats for &#39;target/release/btree-ob-eval s&#39;:
+
+     2,781,531,040      cache-references
+       132,323,303      cache-misses              #    4.757 % of all cache refs
+   196,283,494,716      cycles
+   544,535,582,371      instructions              #    2.77  insn per cycle
+   129,142,369,121      branches
+         2,785,045      faults
+                33      migrations
+</code></pre><p>We see a significant end to end speed up and as expected cache-misses and branches are notably reduced.</p>
+<h2 id="snapshotting">Snapshotting</h2>
+<p>The orderbook structure is useless if we can&rsquo;t get timely snapshots of the data to feed to our trading logic. After some research it becomes clear that the generic StableVec Iterator to too inefficient to retrieve our existing data. Due to the sparsity of the data, it implements a naive scan from 0 to the capacity of the structure:</p>
+<div class="highlight"><pre tabindex="0" style="color:#c6d0f5;background-color:#303446;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Rust" data-lang="Rust"><span style="display:flex;"><span><span style="color:#ca9ee6">unsafe</span> <span style="color:#ca9ee6">fn</span> <span style="color:#8caaee">first_filled_slot_from</span>(<span style="color:#99d1db;font-weight:bold">&amp;</span><span style="color:#99d1db">self</span>, idx: <span style="color:#e78284">usize</span>) -&gt; <span style="color:#99d1db">Option</span><span style="color:#99d1db;font-weight:bold">&lt;</span><span style="color:#e78284">usize</span><span style="color:#99d1db;font-weight:bold">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#8caaee">debug_assert!</span>(idx <span style="color:#99d1db;font-weight:bold">&lt;=</span> <span style="color:#99d1db">self</span>.cap());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    (idx<span style="color:#99d1db;font-weight:bold">..</span><span style="color:#99d1db">self</span>.len()).find(<span style="color:#99d1db;font-weight:bold">|&amp;</span>idx<span style="color:#99d1db;font-weight:bold">|</span> <span style="color:#99d1db">self</span>.has_element_at(idx))
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<p>In this proof of concept we have a significant capacity size of 1_000_000_000. To work around this we implement some tracking pointers which continually identify the best bid and ask indexes. When we generate a snapshot we skip the library Iterator and do a walk outward from these indexes manually.</p>
+<p>When benchmarking these two solutions we take the best of 5 <code>get_snapshot()</code> elapsed time measurements (with an prior call intended to warm the cache). Snapshot sizes are selected as multiples of the BTreeMaps <code>B</code> parameter (16), as it is likely that the fragmentation of the map scales somewhat relatively with multiples of this. The results are below:</p>
+<table>
+<thead>
+<tr>
+<th>Implementation</th>
+<th>Snapshot(32)</th>
+<th>snapshot(64)</th>
+<th>snapshot(128)</th>
+<th>snapshot(256)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BTree</td>
+<td>698.866us</td>
+<td>711.125us</td>
+<td>669.833us</td>
+<td>745.166us</td>
+</tr>
+<tr>
+<td>StableVec</td>
+<td>524ns</td>
+<td>825ns</td>
+<td>1.641us</td>
+<td>3.075us</td>
+</tr>
+</tbody>
+</table>
+<h2 id="conclusion">Conclusion</h2>
+<p>The StableVec implementation has proven itself a superior alternative, notably in the bulk load benchmark but more significantly in the snapshot benchmark where it is consistently order of magnatudes faster than the BTree alternative. I believe this is due to the cache efficiency of the pre-allocated structure.</p>
+<p>In terms of tuning the BTreeMap there are some interesting avenues we&rsquo;ve not explored. One is a study of tuning the <code>B</code> parameter on an implementation which allows it. Another is to provide the BTreeMap with a custom allocator (such as a bump allocator) which allows it to allocate nodes from the same block of contigous memory even over a long lifetime, exploiting memory locality.</p>
+<p>Profiling code is provided <a href="https://github.com/Flugplatz/rust-scratch-public/tree/main/btree-ob-eval">here</a></p>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>Database Internals: A Deep-Dive into How Distributed Data Systems Work - <a href="https://www.databass.dev/">https://www.databass.dev/</a>&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+]]></content>
+        </item>
+        
+        <item>
+            <title>Adjusted t-stat for overlapping samples</title>
+            <link>flugplatz.github.io/posts/adjusted_t-stat/</link>
+            <pubDate>Wed, 13 Dec 2023 19:56:41 +0000</pubDate>
+            
+            <guid>flugplatz.github.io/posts/adjusted_t-stat/</guid>
+            <description>When computing a regression coefficient we hopefully can reject the null hypothesis that there is no relationship between the dependent and independent variable ($ \beta_0 = 0 $). When evaluating a trading strategies returns we aim to reject the null hypothesis that they are unprofitable random noise around 0.
+If we assume the distribution underlying the inputs are normal ($X_{0}$ for regression and $r_{t}$ for returns) we can use the t-stat to decide to reject these hypothesis&amp;rsquo; or not.</description>
+            <content type="html"><![CDATA[<p>When computing a regression coefficient we hopefully can reject the null hypothesis that there is no relationship between the dependent and independent variable ($ \beta_0 = 0 $). When evaluating a trading strategies returns we aim to reject the null hypothesis that they are unprofitable random noise around 0.</p>
+<p>If we assume the distribution underlying the inputs are normal ($X_{0}$ for regression and $r_{t}$ for returns) we can use the <em>t-stat</em> to decide to reject these hypothesis&rsquo; or not. The t-stat measures the number of standard errors (SE) the mean value is from a reference point ($ \beta_0 $). As discussed in our examples above our reference point is 0, so we can drop this term going forward. The SE is a estimator which uses the sample standard deviation ($\hat{\sigma}$) to estimate the population standard deviation ($\sigma$). Note that as the number of samples (N) increases the SE gets smaller, reflecting our increased confidence in our approximation of $\hat{\sigma}$ due to more datapoints - we&rsquo;ll revisit this point later.</p>
+<p>$$ t_{\hat{\beta}} = \frac{\hat{\beta} - \beta_0}{SE(\hat{\beta})} \ \ \ \ \ \ \ SE = \frac{\hat{\sigma}}{\sqrt{N}} $$</p>
+<p>A well known fact of the normal distribution is that around 95% of the values are within $2\sigma$ of the mean. If our t-stat is greater than 2 (read: the mean value is more than $2\sigma$ from 0 - our null hypothesis) then there is a 5% probability this is by random chance. This probability threshold (<em>p-value</em>) of 5% is a common cutoff to reject the null hypothesis in literature. <em>Note:</em> this cutoff is for a single test, if we make multiple attempts the p-value should be reduced accordingly <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>.</p>
+<p>Reading <em>Long Horizon Predictability: A Cautionary Tale</em> <sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>, It warns that when sample overlap is present (common in time series modelling) the standard error can be underestimated. Due to serial correlation in the data we have many datapoints which hold less value individually. To prove trivially we can duplicate all of our data points and watch the SE drop even though we are adding no new data.</p>
+<p>It proposes an adjustment to the non-overlapping variance ($\sigma^2$), the formula is split out below. <em>J</em> is the number of lookahead ticks, <em>ol</em> signifies a series with overlaps, <em>nol</em> is one with no overlaps.</p>
+<p>$$
+var(\hat{\beta}_J^{ol}) = var(\hat{\beta}_J^{nol})[\frac{1}{J} + \theta(J, \rho_J)]
+$$</p>
+<p>$$ \theta(J, \rho_J) = 2 \sum_{j=1}^{J-1} (\frac{J-j}{J^2}) \rho_j $$</p>
+<p>where $\rho_j$ is the $j$th order autocorrelation of $X_{t}$.</p>
+<p>The first part applies a multiplier to the variance of the non-overlapping variance. The multiplier is the summation of $\frac{1}{J}$ and a function $\theta$ of the autocorrelation of the series.</p>
+<p>The multiplier has offsetting adjustments:</p>
+<ul>
+<li>$\frac{1}{J}$ adjusts the multiplier (variance) of <em>nol</em> downwards as <em>ol</em> has J times more observations.</li>
+<li>$\theta$ adjusts the multiplier (variance) upwards as a function of the autocorrelation.  If autocorrelation is high then we are not adding additional information over the <em>nol</em> version (similar to our trivial example where we duplicate all values).</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#c6d0f5;background-color:#303446;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Python" data-lang="Python"><span style="display:flex;"><span><span style="color:#81c8be">from</span> <span style="color:#ef9f76">statsmodels.graphics.tsaplots</span> <span style="color:#81c8be">import</span> acf
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ca9ee6">def</span> <span style="color:#8caaee">adj_t_stat</span>(signal, lookahead):
+</span></span><span style="display:flex;"><span>    J <span style="color:#99d1db;font-weight:bold">=</span> lookahead
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    lags <span style="color:#99d1db;font-weight:bold">=</span> acf(signal, nlags<span style="color:#99d1db;font-weight:bold">=</span>J)
+</span></span><span style="display:flex;"><span>    acc <span style="color:#99d1db;font-weight:bold">=</span> <span style="color:#ef9f76">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ca9ee6">for</span> j <span style="color:#99d1db;font-weight:bold">in</span> <span style="color:#99d1db">range</span>(<span style="color:#ef9f76">1</span>, J):
+</span></span><span style="display:flex;"><span>        a <span style="color:#99d1db;font-weight:bold">=</span> (J<span style="color:#99d1db;font-weight:bold">-</span>j)<span style="color:#99d1db;font-weight:bold">/</span>(J<span style="color:#99d1db;font-weight:bold">**</span><span style="color:#ef9f76">2</span>)
+</span></span><span style="display:flex;"><span>        b <span style="color:#99d1db;font-weight:bold">=</span> lags[j]
+</span></span><span style="display:flex;"><span>        acc <span style="color:#99d1db;font-weight:bold">+=</span> a<span style="color:#99d1db;font-weight:bold">*</span>b
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    adj <span style="color:#99d1db;font-weight:bold">=</span> (<span style="color:#ef9f76">1</span><span style="color:#99d1db;font-weight:bold">/</span>J) <span style="color:#99d1db;font-weight:bold">+</span> (acc<span style="color:#99d1db;font-weight:bold">*</span><span style="color:#ef9f76">2</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    signal_nol <span style="color:#99d1db;font-weight:bold">=</span> signal[::J]
+</span></span><span style="display:flex;"><span>    var_nol <span style="color:#99d1db;font-weight:bold">=</span> signal_nol<span style="color:#99d1db;font-weight:bold">.</span>var()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    var_adj <span style="color:#99d1db;font-weight:bold">=</span> var_nol<span style="color:#99d1db;font-weight:bold">*</span>adj
+</span></span><span style="display:flex;"><span>    se <span style="color:#99d1db;font-weight:bold">=</span> np<span style="color:#99d1db;font-weight:bold">.</span>sqrt(var_adj) <span style="color:#99d1db;font-weight:bold">/</span> np<span style="color:#99d1db;font-weight:bold">.</span>sqrt(<span style="color:#99d1db">len</span>(signal_nol))
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    t <span style="color:#99d1db;font-weight:bold">=</span> signal<span style="color:#99d1db;font-weight:bold">.</span>mean() <span style="color:#99d1db;font-weight:bold">/</span> se
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#ca9ee6">return</span> t</span></span></code></pre></div>
+<p><strong>example adjusting t-stat of f_v_r</strong></p>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>sharpe paper&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>Jacob Boudoukh, Ronen Israel &amp; Matthew Richardson (2019) Long-Horizon Predictability: A Cautionary Tale, Financial Analysts Journal, 75:1, 17-30, DOI: 10.1080/0015198X.2018.1547056&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+]]></content>
+        </item>
+        
+    </channel>
+</rss>
