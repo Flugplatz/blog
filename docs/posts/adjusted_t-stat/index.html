@@ -40,7 +40,7 @@ If we assume the distribution underlying the inputs are normal ($X_{0}$ for regr
 <meta itemprop="description" content="When computing a regression coefficient we hopefully can reject the null hypothesis that there is no relationship between the dependent and independent variable ($ \beta_0 = 0 $). When evaluating a trading strategies returns we aim to reject the null hypothesis that they are unprofitable random noise around 0.
 If we assume the distribution underlying the inputs are normal ($X_{0}$ for regression and $r_{t}$ for returns) we can use the t-stat to decide to reject these hypothesis&rsquo; or not."><meta itemprop="datePublished" content="2023-12-13T19:56:41+00:00" />
 <meta itemprop="dateModified" content="2023-12-13T19:56:41+00:00" />
-<meta itemprop="wordCount" content="574"><meta itemprop="image" content="https://flugplatz.github.io/blog/"/>
+<meta itemprop="wordCount" content="567"><meta itemprop="image" content="https://flugplatz.github.io/blog/"/>
 <meta itemprop="keywords" content="t-stat,sampling," />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://flugplatz.github.io/blog/"/>
@@ -179,13 +179,8 @@ $$</p>
 </span></span><span style="display:flex;"><span>    J <span style="color:#99d1db;font-weight:bold">=</span> lookahead
 </span></span><span style="display:flex;"><span>    
 </span></span><span style="display:flex;"><span>    lags <span style="color:#99d1db;font-weight:bold">=</span> acf(signal, nlags<span style="color:#99d1db;font-weight:bold">=</span>J)
-</span></span><span style="display:flex;"><span>    acc <span style="color:#99d1db;font-weight:bold">=</span> <span style="color:#ef9f76">0</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#ca9ee6">for</span> j <span style="color:#99d1db;font-weight:bold">in</span> <span style="color:#99d1db">range</span>(<span style="color:#ef9f76">1</span>, J):
-</span></span><span style="display:flex;"><span>        a <span style="color:#99d1db;font-weight:bold">=</span> (J<span style="color:#99d1db;font-weight:bold">-</span>j)<span style="color:#99d1db;font-weight:bold">/</span>(J<span style="color:#99d1db;font-weight:bold">**</span><span style="color:#ef9f76">2</span>)
-</span></span><span style="display:flex;"><span>        b <span style="color:#99d1db;font-weight:bold">=</span> lags[j]
-</span></span><span style="display:flex;"><span>        acc <span style="color:#99d1db;font-weight:bold">+=</span> a<span style="color:#99d1db;font-weight:bold">*</span>b
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    adj <span style="color:#99d1db;font-weight:bold">=</span> (<span style="color:#ef9f76">1</span><span style="color:#99d1db;font-weight:bold">/</span>J) <span style="color:#99d1db;font-weight:bold">+</span> (acc<span style="color:#99d1db;font-weight:bold">*</span><span style="color:#ef9f76">2</span>)
+</span></span><span style="display:flex;"><span>    theta <span style="color:#99d1db;font-weight:bold">=</span> <span style="color:#ef9f76">2</span> <span style="color:#99d1db;font-weight:bold">*</span> <span style="color:#99d1db">sum</span>([((J<span style="color:#99d1db;font-weight:bold">-</span>j)<span style="color:#99d1db;font-weight:bold">/</span>(J<span style="color:#99d1db;font-weight:bold">**</span><span style="color:#ef9f76">2</span>))<span style="color:#99d1db;font-weight:bold">*</span>lags[j] <span style="color:#ca9ee6">for</span> j <span style="color:#99d1db;font-weight:bold">in</span> <span style="color:#99d1db">range</span>(<span style="color:#ef9f76">1</span>, J)])
+</span></span><span style="display:flex;"><span>    adj <span style="color:#99d1db;font-weight:bold">=</span> (<span style="color:#ef9f76">1</span><span style="color:#99d1db;font-weight:bold">/</span>J) <span style="color:#99d1db;font-weight:bold">+</span> theta
 </span></span><span style="display:flex;"><span>    
 </span></span><span style="display:flex;"><span>    signal_nol <span style="color:#99d1db;font-weight:bold">=</span> signal[::J]
 </span></span><span style="display:flex;"><span>    var_nol <span style="color:#99d1db;font-weight:bold">=</span> signal_nol<span style="color:#99d1db;font-weight:bold">.</span>var()
@@ -234,7 +229,7 @@ $$</p>
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        574 Words
+        567 Words
       </p>
 
       <p>
