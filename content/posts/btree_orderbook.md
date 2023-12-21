@@ -60,7 +60,7 @@ We see a significant end to end speed up and as expected cache-misses and branch
 
 ## Snapshotting
 
-The orderbook structure is useless if we can't get timely snapshots of the data to feed to our trading logic. After some research it becomes clear that the generic StableVec Iterator to too inefficient to retrieve our existing data. Due to the sparsity of the data, it implements a naive scan from 0 to the capacity of the structure: 
+The orderbook structure is useless if we can't get timely snapshots of the data to feed to our trading logic. After some research it becomes clear that the generic StableVec Iterator is to inefficient to retrieve our existing data. Due to the sparsity of the data, it implements a naive scan from 0 to the capacity of the structure: 
 
 {{< highlight Rust >}}
 unsafe fn first_filled_slot_from(&self, idx: usize) -> Option<usize> {
