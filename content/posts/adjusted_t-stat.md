@@ -43,13 +43,8 @@ def adj_t_stat(signal, lookahead):
     J = lookahead
     
     lags = acf(signal, nlags=J)
-    acc = 0
-    for j in range(1, J):
-        a = (J-j)/(J**2)
-        b = lags[j]
-        acc += a*b
-
-    adj = (1/J) + (acc*2)
+    theta = 2 * sum([((J-j)/(J**2))*lags[j] for j in range(1, J)])
+    adj = (1/J) + theta
     
     signal_nol = signal[::J]
     var_nol = signal_nol.var()
