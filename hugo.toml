@@ -1,4 +1,4 @@
-baseurl      = "flugplatz.github.io"
+baseurl      = "flugplatz.github.io/blog/"
 title        = "My Blog"
 languageCode = "en-us"
 theme        = "hello-friend-ng"
