@@ -72,7 +72,7 @@ unsafe fn first_filled_slot_from(&self, idx: usize) -> Option<usize> {
 
 In this proof of concept we have a significant capacity size of 1_000_000_000. To work around this we implement some tracking pointers which continually identify the best bid and ask indexes. When we generate a snapshot we skip the library Iterator and do a walk outward from these indexes manually. 
 
-When benchmarking these two solutions we take the best of 5 `get_snapshot()` elapsed time measurements (with an prior call intended to warm the cache). Snapshot sizes are selected as multiples of the BTreeMaps `B` parameter (16), as it is likely that the fragmentation of the map scales somewhat relatively with multiples of this. The results are below:
+When benchmarking the two implementations we take the best of 5 `get_snapshot()` elapsed time measurements (with an prior call intended to warm the cache). Snapshot sizes are selected as multiples of the BTreeMaps `B` parameter (16), as it is likely that the fragmentation of the BTreeMap implementation scales somewhat relatively with multiples of this. The results are below:
   
   
 

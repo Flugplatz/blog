@@ -64,7 +64,7 @@ It was presented as a disadvantage that file based databases have to marshall th
 </span></span><span style="display:flex;"><span>    (idx<span style="color:#99d1db;font-weight:bold">..</span><span style="color:#99d1db">self</span>.len()).find(<span style="color:#99d1db;font-weight:bold">|&amp;</span>idx<span style="color:#99d1db;font-weight:bold">|</span> <span style="color:#99d1db">self</span>.has_element_at(idx))
 </span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 <p>In this proof of concept we have a significant capacity size of 1_000_000_000. To work around this we implement some tracking pointers which continually identify the best bid and ask indexes. When we generate a snapshot we skip the library Iterator and do a walk outward from these indexes manually.</p>
-<p>When benchmarking these two solutions we take the best of 5 <code>get_snapshot()</code> elapsed time measurements (with an prior call intended to warm the cache). Snapshot sizes are selected as multiples of the BTreeMaps <code>B</code> parameter (16), as it is likely that the fragmentation of the map scales somewhat relatively with multiples of this. The results are below:</p>
+<p>When benchmarking the two implementations we take the best of 5 <code>get_snapshot()</code> elapsed time measurements (with an prior call intended to warm the cache). Snapshot sizes are selected as multiples of the BTreeMaps <code>B</code> parameter (16), as it is likely that the fragmentation of the BTreeMap implementation scales somewhat relatively with multiples of this. The results are below:</p>
 <table>
 <thead>
 <tr>
