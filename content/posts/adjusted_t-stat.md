@@ -16,7 +16,7 @@ If we assume the distribution underlying the inputs are normal ($X_{0}$ for regr
 
 $$ t_{\hat{\beta}} = \frac{\hat{\beta} - \beta_0}{SE(\hat{\beta})} \ \ \ \ \ \ \ SE = \frac{\hat{\sigma}}{\sqrt{N}} $$
 
-A well known fact of the normal distribution is that around 95% of the values are within $2\sigma$ of the mean. If our t-stat is greater than 2 (read: the mean value is more than $2\sigma$ from 0 - our null hypothesis) then there is a 5% probability this is by random chance. This probability threshold (*p-value*) of 5% is a common cutoff to reject the null hypothesis in literature. *Note:* this cutoff is for a single test, if we make multiple attempts the p-value should be reduced accordingly [^2].
+A well known fact of the normal distribution is that around 95% of the values are within $2\sigma$ of the mean. If our t-stat is greater than 2 (read: the mean value is more than $2\sigma$ from 0 - our null hypothesis) then there is a 5% probability this is by random chance. This probability threshold (*p-value*) of 5% is a common cutoff to reject the null hypothesis in literature. *Note:* this cutoff is for a single test, if we make multiple attempts the p-value should be reduced accordingly.
 
 Reading *Long Horizon Predictability: A Cautionary Tale* [^1], It warns that when sample overlap is present (common in time series modelling) the standard error can be underestimated. Due to serial correlation in the data we have many datapoints which hold less value individually. To prove trivially we can duplicate all of our data points and watch the SE drop even though we are adding no new data.
 
@@ -59,7 +59,6 @@ def adj_t_stat(signal, lookahead):
 
 **example adjusting t-stat of f_v_r** 
 
+![targets](/images/adj_t_stat.png)
 
 [^1]: Jacob Boudoukh, Ronen Israel & Matthew Richardson (2019) Long-Horizon Predictability: A Cautionary Tale, Financial Analysts Journal, 75:1, 17-30, DOI: 10.1080/0015198X.2018.1547056
-
-[^2]: sharpe paper

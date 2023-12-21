@@ -118,8 +118,8 @@ If we assume the distribution underlying the inputs are normal ($X_{0}$ for regr
             <content type="html"><![CDATA[<p>When computing a regression coefficient we hopefully can reject the null hypothesis that there is no relationship between the dependent and independent variable ($ \beta_0 = 0 $). When evaluating a trading strategies returns we aim to reject the null hypothesis that they are unprofitable random noise around 0.</p>
 <p>If we assume the distribution underlying the inputs are normal ($X_{0}$ for regression and $r_{t}$ for returns) we can use the <em>t-stat</em> to decide to reject these hypothesis&rsquo; or not. The t-stat measures the number of standard errors (SE) the mean value is from a reference point ($ \beta_0 $). As discussed in our examples above our reference point is 0, so we can drop this term going forward. The SE is a estimator which uses the sample standard deviation ($\hat{\sigma}$) to estimate the population standard deviation ($\sigma$). Note that as the number of samples (N) increases the SE gets smaller, reflecting our increased confidence in our approximation of $\hat{\sigma}$ due to more datapoints - we&rsquo;ll revisit this point later.</p>
 <p>$$ t_{\hat{\beta}} = \frac{\hat{\beta} - \beta_0}{SE(\hat{\beta})} \ \ \ \ \ \ \ SE = \frac{\hat{\sigma}}{\sqrt{N}} $$</p>
-<p>A well known fact of the normal distribution is that around 95% of the values are within $2\sigma$ of the mean. If our t-stat is greater than 2 (read: the mean value is more than $2\sigma$ from 0 - our null hypothesis) then there is a 5% probability this is by random chance. This probability threshold (<em>p-value</em>) of 5% is a common cutoff to reject the null hypothesis in literature. <em>Note:</em> this cutoff is for a single test, if we make multiple attempts the p-value should be reduced accordingly <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>.</p>
-<p>Reading <em>Long Horizon Predictability: A Cautionary Tale</em> <sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>, It warns that when sample overlap is present (common in time series modelling) the standard error can be underestimated. Due to serial correlation in the data we have many datapoints which hold less value individually. To prove trivially we can duplicate all of our data points and watch the SE drop even though we are adding no new data.</p>
+<p>A well known fact of the normal distribution is that around 95% of the values are within $2\sigma$ of the mean. If our t-stat is greater than 2 (read: the mean value is more than $2\sigma$ from 0 - our null hypothesis) then there is a 5% probability this is by random chance. This probability threshold (<em>p-value</em>) of 5% is a common cutoff to reject the null hypothesis in literature. <em>Note:</em> this cutoff is for a single test, if we make multiple attempts the p-value should be reduced accordingly.</p>
+<p>Reading <em>Long Horizon Predictability: A Cautionary Tale</em> <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>, It warns that when sample overlap is present (common in time series modelling) the standard error can be underestimated. Due to serial correlation in the data we have many datapoints which hold less value individually. To prove trivially we can duplicate all of our data points and watch the SE drop even though we are adding no new data.</p>
 <p>It proposes an adjustment to the non-overlapping variance ($\sigma^2$), the formula is split out below. <em>J</em> is the number of lookahead ticks, <em>ol</em> signifies a series with overlaps, <em>nol</em> is one with no overlaps.</p>
 <p>$$
 var(\hat{\beta}_J^{ol}) = var(\hat{\beta}_J^{nol})[\frac{1}{J} + \theta(J, \rho_J)]
@@ -151,14 +151,12 @@ $$</p>
 </span></span><span style="display:flex;"><span>    
 </span></span><span style="display:flex;"><span>    <span style="color:#ca9ee6">return</span> t</span></span></code></pre></div>
 <p><strong>example adjusting t-stat of f_v_r</strong></p>
+<p><img src="/images/adj_t_stat.png" alt="targets"></p>
 <div class="footnotes" role="doc-endnotes">
 <hr>
 <ol>
 <li id="fn:1">
-<p>sharpe paper&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
-</li>
-<li id="fn:2">
-<p>Jacob Boudoukh, Ronen Israel &amp; Matthew Richardson (2019) Long-Horizon Predictability: A Cautionary Tale, Financial Analysts Journal, 75:1, 17-30, DOI: 10.1080/0015198X.2018.1547056&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>Jacob Boudoukh, Ronen Israel &amp; Matthew Richardson (2019) Long-Horizon Predictability: A Cautionary Tale, Financial Analysts Journal, 75:1, 17-30, DOI: 10.1080/0015198X.2018.1547056&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 </ol>
 </div>
