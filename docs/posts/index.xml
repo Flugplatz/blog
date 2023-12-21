@@ -10,14 +10,14 @@
         <atom:link href="https://flugplatz.github.io/blog/posts/index.xml" rel="self" type="application/rss+xml" />
         
         <item>
-            <title>Is the BTree an efficient structure to model an orderbook?</title>
+            <title>Is the BTree an efficient structure to model an order book?</title>
             <link>https://flugplatz.github.io/blog/posts/btree_orderbook/</link>
             <pubDate>Wed, 20 Dec 2023 13:29:35 +0000</pubDate>
             
             <guid>https://flugplatz.github.io/blog/posts/btree_orderbook/</guid>
-            <description>The orderbook is an interesting object to model, likely to be dense with orders near the top of the book and sparser as we walk outwards towards the &amp;ldquo;stink bids&amp;rdquo;. While reading Database Internals: A Deep-Dive into How Distributed Data Systems Work 1, its low level discussion of BTree internals peaked my curiosity into the efficiency of using a BTree to model an orderbook. My main observations are:
+            <description>The order book is an interesting object to model, likely to be dense with orders near the top of the book and sparser as we walk outwards towards the &amp;ldquo;stink bids&amp;rdquo;. While reading Database Internals: A Deep-Dive into How Distributed Data Systems Work 1, its low level discussion of BTree internals peaked my curiosity into the efficiency of using a BTree to model an orderbook. My main observations are:
 It was presented as a disadvantage that file based databases have to marshall their data structures explicitly on disk while in-memory databases just malloc() memory chunks from an allocator.</description>
-            <content type="html"><![CDATA[<p>The orderbook is an interesting object to model, likely to be dense with orders near the top of the book and sparser as we walk outwards towards the &ldquo;stink bids&rdquo;. While reading <em>Database Internals: A Deep-Dive into How Distributed Data Systems Work</em> <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>, its low level discussion of BTree internals peaked my curiosity into the efficiency of using a BTree to model an orderbook. My main observations are:</p>
+            <content type="html"><![CDATA[<p>The order book is an interesting object to model, likely to be dense with orders near the top of the book and sparser as we walk outwards towards the &ldquo;stink bids&rdquo;. While reading <em>Database Internals: A Deep-Dive into How Distributed Data Systems Work</em> <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>, its low level discussion of BTree internals peaked my curiosity into the efficiency of using a BTree to model an orderbook. My main observations are:</p>
 <ol>
 <li>
 <p>It was presented as a disadvantage that file based databases have to marshall their data structures explicitly on disk while in-memory databases just <code>malloc()</code> memory chunks from an allocator. However, if the memory returned from the allocator is fragmented then the cache efficiency of traversing the BTree structure is going to be impacted negatively.</p>
@@ -151,7 +151,7 @@ $$</p>
 </span></span><span style="display:flex;"><span>    
 </span></span><span style="display:flex;"><span>    <span style="color:#ca9ee6">return</span> t</span></span></code></pre></div>
 <p><strong>example adjusting t-stat of f_v_r</strong></p>
-<p><img src="/blog/static/images/adj_t_stat.png" alt="Example image"></p>
+<p><img src="/images/adj_t_stat.png" alt="Example image"></p>
 <div class="footnotes" role="doc-endnotes">
 <hr>
 <ol>

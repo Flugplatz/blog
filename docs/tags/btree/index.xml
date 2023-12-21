@@ -10,11 +10,11 @@
     <lastBuildDate>Wed, 20 Dec 2023 13:29:35 +0000</lastBuildDate>
     <atom:link href="https://flugplatz.github.io/blog/tags/btree/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Is the BTree an efficient structure to model an orderbook?</title>
+      <title>Is the BTree an efficient structure to model an order book?</title>
       <link>https://flugplatz.github.io/blog/posts/btree_orderbook/</link>
       <pubDate>Wed, 20 Dec 2023 13:29:35 +0000</pubDate>
       <guid>https://flugplatz.github.io/blog/posts/btree_orderbook/</guid>
-      <description>The orderbook is an interesting object to model, likely to be dense with orders near the top of the book and sparser as we walk outwards towards the &amp;ldquo;stink bids&amp;rdquo;. While reading Database Internals: A Deep-Dive into How Distributed Data Systems Work 1, its low level discussion of BTree internals peaked my curiosity into the efficiency of using a BTree to model an orderbook. My main observations are:
+      <description>The order book is an interesting object to model, likely to be dense with orders near the top of the book and sparser as we walk outwards towards the &amp;ldquo;stink bids&amp;rdquo;. While reading Database Internals: A Deep-Dive into How Distributed Data Systems Work 1, its low level discussion of BTree internals peaked my curiosity into the efficiency of using a BTree to model an orderbook. My main observations are:
 It was presented as a disadvantage that file based databases have to marshall their data structures explicitly on disk while in-memory databases just malloc() memory chunks from an allocator.</description>
     </item>
   </channel>

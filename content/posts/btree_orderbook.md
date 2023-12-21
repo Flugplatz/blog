@@ -1,5 +1,5 @@
 ---
-title: "Is the BTree an efficient structure to model an orderbook?"
+title: "Is the BTree an efficient structure to model an order book?"
 date: 2023-12-20T13:29:35Z
 draft: false
 toc: false
@@ -10,7 +10,7 @@ tags:
   - btree
 ---
 
-The orderbook is an interesting object to model, likely to be dense with orders near the top of the book and sparser as we walk outwards towards the "stink bids". While reading *Database Internals: A Deep-Dive into How Distributed Data Systems Work* [^1], its low level discussion of BTree internals peaked my curiosity into the efficiency of using a BTree to model an orderbook. My main observations are:
+The order book is an interesting object to model, likely to be dense with orders near the top of the book and sparser as we walk outwards towards the "stink bids". While reading *Database Internals: A Deep-Dive into How Distributed Data Systems Work* [^1], its low level discussion of BTree internals peaked my curiosity into the efficiency of using a BTree to model an orderbook. My main observations are:
 
 1. It was presented as a disadvantage that file based databases have to marshall their data structures explicitly on disk while in-memory databases just `malloc()` memory chunks from an allocator. However, if the memory returned from the allocator is fragmented then the cache efficiency of traversing the BTree structure is going to be impacted negatively.
 

@@ -59,6 +59,6 @@ def adj_t_stat(signal, lookahead):
 
 **example adjusting t-stat of f_v_r** 
 
-![Example image](/blog/static/images/adj_t_stat.png)
+![Example image](/images/adj_t_stat.png)
 
 [^1]: Jacob Boudoukh, Ronen Israel & Matthew Richardson (2019) Long-Horizon Predictability: A Cautionary Tale, Financial Analysts Journal, 75:1, 17-30, DOI: 10.1080/0015198X.2018.1547056
