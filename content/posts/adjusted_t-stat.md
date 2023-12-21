@@ -57,8 +57,8 @@ def adj_t_stat(signal, lookahead):
     return t
 {{< /highlight >}}
 
-**example adjusting t-stat of f_v_r** 
+We can see the effect of the adjustment in the scatterplot below. This is taken from some walk forward testing of a trading strategy.
 
-![Example image](/blog/images/adj_t_stat.png)
+![Adjustment](/blog/images/adj_t_stat.png)
 
 [^1]: Jacob Boudoukh, Ronen Israel & Matthew Richardson (2019) Long-Horizon Predictability: A Cautionary Tale, Financial Analysts Journal, 75:1, 17-30, DOI: 10.1080/0015198X.2018.1547056
