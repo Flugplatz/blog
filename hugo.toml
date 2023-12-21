@@ -1,4 +1,4 @@
-baseurl      = "flugplatz.github.io/blog/"
+baseurl      = "http://flugplatz.github.io/blog/"
 title        = "My Blog"
 languageCode = "en-us"
 theme        = "hello-friend-ng"
@@ -44,7 +44,7 @@ publishDir = "docs"
     subtitle  = "A simple theme for Hugo"
 
     [languages.en.params.logo]
-      logoText = "hello world"
+      logoText = "hello friend"
       logoHomeLink = "/"
     # or
     #
